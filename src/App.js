@@ -1,20 +1,26 @@
+import React from 'react';
+import { Route, Routes, BrowserRouter } from 'react-router-dom';
+import { ProtectedRoute } from './protectedRoutes';
+import { ProtectedRouteTypes } from './utils/enums';
+import Login from './containers/Login';
+import Dashboard from './containers/Dashboard';
+
 function App() {
   return (
-    <div className='App'>
-      <header className='App-header'>
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className='App-link'
-          href='https://reactjs.org'
-          target='_blank'
-          rel='noopener noreferrer'
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route
+          path='/'
+          element={
+            <ProtectedRoute
+              type={ProtectedRouteTypes.DOUBLE}
+              mainComponent={Dashboard}
+              fallbackComponent={Login}
+            />
+          }
+        />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
