@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { URL_BACKEND, TOKEN_NAME } from '../utils/enums';
 
-const fetch = () => {
+export const fetch = () => {
   axios.defaults.baseURL = URL_BACKEND;
   const token = JSON.parse(localStorage.getItem(TOKEN_NAME));
   if (token) {
@@ -10,5 +10,3 @@ const fetch = () => {
 
   return axios;
 };
-
-export default fetch;

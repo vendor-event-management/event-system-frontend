@@ -2,30 +2,27 @@ import React from 'react';
 import { Navigate } from 'react-router-dom';
 
 import { verify } from './utils';
-import { TOKEN_NAME, ProtectedRouteTypes } from './utils/enums';
+import { ProtectedRouteTypes } from './utils/enums';
 
 export const ProtectedRoute = ({
-  component: MainComponent,
+  mainComponent: MainComponent,
   fallbackComponent: FallbackComponent,
   ...props
 }) => {
-  const token = JSON.parse(localStorage.getItem(TOKEN_NAME));
-  console.log('props : ', props);
-
   if (props.type === ProtectedRouteTypes.TRIPLE) {
-    if (!token) {
+    if (!verify()) {
       return <Navigate to={props.redirectTo} />;
     }
 
     const userRole = verify()?.role;
 
-    if (userRole === 'admin') {
+    if (userRole === 'HR') {
       return <MainComponent {...props} />;
     } else {
       return <FallbackComponent {...props} />;
     }
   } else {
-    return token ? (
+    return verify() ? (
       <MainComponent {...props} />
     ) : (
       <FallbackComponent {...props} />

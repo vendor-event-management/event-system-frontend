@@ -4,10 +4,12 @@ import { ProtectedRoute } from './protectedRoutes';
 import { ProtectedRouteTypes } from './utils/enums';
 import Login from './containers/Login';
 import Dashboard from './containers/Dashboard';
+import Header from './components/Header';
 
 function App() {
   return (
     <BrowserRouter>
+      <Header />
       <Routes>
         <Route
           path='/'

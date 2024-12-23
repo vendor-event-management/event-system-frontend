@@ -7,9 +7,15 @@ import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
+import Swal from 'sweetalert2';
 import { styled } from '@mui/material/styles';
 import { useFormik } from 'formik';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { loginUser } from '../state/auth/authSlice';
 import * as yup from 'yup';
+
+import { LOADING } from '../state/statusEnum';
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -37,22 +43,36 @@ const SignInContainer = styled(Stack)(({ theme }) => ({
 }));
 
 function Login() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { status } = useSelector((state) => state.auth);
+  const isLoading = status === LOADING;
+
   const formik = useFormik({
     initialValues: {
-      email: '',
+      username: '',
       password: '',
     },
     validationSchema: yup.object({
-      email: yup
-        .string()
-        .email('Invalid email format')
-        .required('Please enter your email'),
+      username: yup.string().required('Please enter your username'),
       password: yup.string().required('Please enter your password'),
     }),
     validateOnChange: false,
     validateOnBlur: false,
-    onSubmit: (values) => {
-      console.log('values : ', values);
+    onSubmit: async (values) => {
+      const { username, password } = values;
+      const result = await dispatch(loginUser({ username, password }));
+      if (loginUser.fulfilled.match(result)) {
+        Swal.fire({
+          icon: 'success',
+          title: 'Login successful',
+        }).then(() => navigate('/dashboard'));
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: result?.payload,
+        });
+      }
     },
   });
 
@@ -78,20 +98,20 @@ function Login() {
           }}
         >
           <FormControl>
-            <FormLabel htmlFor='email'>Email</FormLabel>
+            <FormLabel htmlFor='username'>Username</FormLabel>
             <TextField
-              id='email'
-              type='email'
-              name='email'
-              placeholder='your@email.com'
-              autoComplete='email'
+              id='username'
+              type='username'
+              name='username'
+              placeholder='username'
+              autoComplete='username'
               autoFocus
               required
               fullWidth
               variant='outlined'
-              {...formik.getFieldProps('email')}
-              error={Boolean(formik.errors.email)}
-              helperText={formik.errors.email || ''}
+              {...formik.getFieldProps('username')}
+              error={Boolean(formik.errors.username)}
+              helperText={formik.errors.username || ''}
             />
           </FormControl>
           <FormControl>
@@ -111,7 +131,12 @@ function Login() {
               helperText={formik.errors.password || ''}
             />
           </FormControl>
-          <Button type='submit' fullWidth variant='contained'>
+          <Button
+            type='submit'
+            fullWidth
+            variant='contained'
+            disabled={isLoading}
+          >
             Sign in
           </Button>
         </Box>
