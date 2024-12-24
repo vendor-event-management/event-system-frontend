@@ -89,6 +89,11 @@ function Dashboard() {
     setOpenPopupCreation(false);
   };
 
+  const handlePageChange = (event, value) => {
+    formik.setFieldValue('page', value);
+    formik.submitForm();
+  };
+
   const formik = useFormik({
     initialValues: {
       name: '',
@@ -97,8 +102,6 @@ function Dashboard() {
       size: 10,
     },
     onSubmit: async (values) => {
-      console.log(values);
-
       dispatch(getEvents({ userId, ...values }));
     },
   });
@@ -316,7 +319,9 @@ function Dashboard() {
                 <Grid size={4}>
                   <Box sx={{ paddingTop: 2 }}>
                     <Pagination
-                      count={selectorEventData.pagination?.totalPages}
+                      count={selectorEventData.data?.pagination?.totalPages}
+                      page={formik.values.page}
+                      onChange={handlePageChange}
                       color='primary'
                     />
                   </Box>
