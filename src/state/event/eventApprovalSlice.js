@@ -1,25 +1,23 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { fetchEvents } from '../api';
+import { putApprovalEvent } from '../api';
 import { FAILED, IDLE, LOADING, SUCCEEDED } from '../statusEnum';
 
 const initialState = {
-  data: [],
   status: IDLE,
   isLoading: false,
   error: null,
 };
 
-export const getEvents = createAsyncThunk(
-  'event/fetchEvents',
-  async (params = {}, { rejectWithValue }) => {
+export const approveOrRejectEvent = createAsyncThunk(
+  'event/approveOrRejectEvent',
+  async (params, { rejectWithValue }) => {
     try {
-      const query = {
-        page: params.page || 1,
-        size: params.size || 10,
-        status: params.status,
-        name: params.name,
+      const body = {
+        status: params.status || '',
+        remarks: params.remarks || '',
+        confirmedDate: params.confirmedDate || '',
       };
-      const response = await fetchEvents(params.userId, query);
+      const response = await putApprovalEvent(params.eventId, body);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || error.message);
@@ -28,22 +26,21 @@ export const getEvents = createAsyncThunk(
 );
 
 const eventSlice = createSlice({
-  name: 'event',
+  name: 'eventApproval',
   initialState,
   extraReducers: (builder) => {
     builder
-      .addCase(getEvents.pending, (state) => {
+      .addCase(approveOrRejectEvent.pending, (state) => {
         state.isLoading = true;
         state.status = LOADING;
         state.error = null;
       })
-      .addCase(getEvents.fulfilled, (state, action) => {
+      .addCase(approveOrRejectEvent.fulfilled, (state, action) => {
         state.isLoading = false;
         state.status = SUCCEEDED;
         state.error = null;
-        state.data = action.payload;
       })
-      .addCase(getEvents.rejected, (state, action) => {
+      .addCase(approveOrRejectEvent.rejected, (state, action) => {
         state.isLoading = false;
         state.status = FAILED;
         state.error = action.payload;

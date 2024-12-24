@@ -21,10 +21,12 @@ import Stack from '@mui/material/Stack';
 import Grid from '@mui/material/Grid2';
 import Chip from '@mui/material/Chip';
 import Swal from 'sweetalert2';
+
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { verify } from '../utils';
+import { verify as user } from '../utils';
 import { logout } from '../state/auth/authSlice';
+import { UserRole } from '../utils/enums/userRole';
 
 const drawerWidth = 240;
 
@@ -77,7 +79,7 @@ export default function Header() {
       <CssBaseline />
       <AppBar position='fixed' open={open}>
         <Toolbar>
-          {verify() && (
+          {user() && (
             <IconButton
               color='inherit'
               aria-label='open drawer'
@@ -127,12 +129,12 @@ export default function Header() {
               </Stack>
               <Stack direction={'column'} spacing={0.5} paddingLeft={0.5}>
                 <Typography fontSize={15}>{`Halo, ${
-                  verify().username
+                  user().fullName
                 }`}</Typography>
-                {verify().role === 'Vendor' ? (
-                  <Chip label='Vendor' color='success' size='small' />
+                {user().role === UserRole.Vendor ? (
+                  <Chip label={UserRole.Vendor} color='success' size='small' />
                 ) : (
-                  <Chip label='HR' color='primary' size='small' />
+                  <Chip label={UserRole.HR} color='primary' size='small' />
                 )}
               </Stack>
             </Stack>

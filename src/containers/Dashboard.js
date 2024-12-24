@@ -24,11 +24,13 @@ import moment from 'moment';
 
 import { useFormik } from 'formik';
 import { useDispatch, useSelector } from 'react-redux';
-import { verify } from '../utils';
+import { EventStatus, verify as user } from '../utils';
 import { getEvents } from '../state/event/eventSlice';
 import { getDetailEvent } from '../state/event/eventDetailSlice';
 import { EventDetailComponent } from './Popup/EventDetail';
 import { EventApprovalComponent } from './Popup/EventApproval';
+import { EventCreationComponent } from './Popup/EventCreation';
+import { UserRole } from '../utils/enums/userRole';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -52,13 +54,14 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 function Dashboard() {
   const [openPopup, setOpenPopup] = React.useState(false);
   const [openPopupApproval, setOpenPopupApproval] = React.useState(false);
+  const [openPopupCreation, setOpenPopupCreation] = React.useState(false);
   const [isApproveEvent, setIsApproveEvent] = React.useState(false);
 
   const selectorEventData = useSelector((state) => state.event);
   const selectorEventDetailData = useSelector((state) => state.eventDetail);
 
   const dispatch = useDispatch();
-  const userId = verify()?.id;
+  const userId = user()?.id;
 
   const handleClickOpenPopup = (event) => {
     dispatch(getDetailEvent({ id: event.id }));
@@ -76,6 +79,14 @@ function Dashboard() {
 
   const handleClosePopupApproval = () => {
     setOpenPopupApproval(false);
+  };
+
+  const handleClickOpenPopupCreation = () => {
+    setOpenPopupCreation(true);
+  };
+
+  const handleClosePopupCreation = () => {
+    setOpenPopupCreation(false);
   };
 
   const formik = useFormik({
@@ -112,7 +123,7 @@ function Dashboard() {
               }}
             >
               <Box component='form' noValidate onSubmit={formik.handleSubmit}>
-                <Grid size={8}>
+                <Grid size={12}>
                   <Stack direction='row' paddingBottom={4} spacing={4}>
                     <TextField
                       id='name'
@@ -138,9 +149,13 @@ function Dashboard() {
                         <MenuItem value=''>
                           <em>None</em>
                         </MenuItem>
-                        <MenuItem value={'Pending'}>Pending</MenuItem>
-                        <MenuItem value={'Approved'}>Approved</MenuItem>
-                        <MenuItem value={'Rejected'}>Rejected</MenuItem>
+                        <MenuItem value={EventStatus.Pending}>Pending</MenuItem>
+                        <MenuItem value={EventStatus.Approved}>
+                          Approved
+                        </MenuItem>
+                        <MenuItem value={EventStatus.Rejected}>
+                          Rejected
+                        </MenuItem>
                       </Select>
                     </FormControl>
                     <Box
@@ -160,9 +175,28 @@ function Dashboard() {
                         color='error'
                         onClick={() => handleClearSearch()}
                       >
-                        clear
+                        Clear
                       </Button>
                     </Box>
+                    {user().role === UserRole.HR && (
+                      <Box
+                        sx={{
+                          paddingTop: 2,
+                          display: 'flex',
+                          flexGrow: 1,
+                        }}
+                      >
+                        {' '}
+                        <Button
+                          variant='contained'
+                          size='small'
+                          sx={{ marginLeft: 'auto' }}
+                          onClick={() => handleClickOpenPopupCreation()}
+                        >
+                          Create event
+                        </Button>
+                      </Box>
+                    )}
                   </Stack>
                 </Grid>
                 <Grid size={12}>
@@ -300,9 +334,14 @@ function Dashboard() {
       />
       <EventApprovalComponent
         open={openPopupApproval}
-        onClose={handleClosePopupApproval}
-        proposedDates={selectorEventDetailData?.data?.proposedDates}
+        onClosePopupApproval={handleClosePopupApproval}
+        onClosePopupDetail={handleClosePopup}
+        event={selectorEventDetailData?.data}
         isApprove={isApproveEvent}
+      />
+      <EventCreationComponent
+        open={openPopupCreation}
+        onClose={handleClosePopupCreation}
       />
     </React.Fragment>
   );

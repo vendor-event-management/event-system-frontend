@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { fetchEvents } from '../api';
+import { fetchVendors } from '../api';
 import { FAILED, IDLE, LOADING, SUCCEEDED } from '../statusEnum';
 
 const initialState = {
@@ -9,17 +9,11 @@ const initialState = {
   error: null,
 };
 
-export const getEvents = createAsyncThunk(
-  'event/fetchEvents',
+export const getVendors = createAsyncThunk(
+  'user/getVendors',
   async (params = {}, { rejectWithValue }) => {
     try {
-      const query = {
-        page: params.page || 1,
-        size: params.size || 10,
-        status: params.status,
-        name: params.name,
-      };
-      const response = await fetchEvents(params.userId, query);
+      const response = await fetchVendors(params);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || error.message);
@@ -27,23 +21,23 @@ export const getEvents = createAsyncThunk(
   }
 );
 
-const eventSlice = createSlice({
-  name: 'event',
+const getVendorSlice = createSlice({
+  name: 'getVendors',
   initialState,
   extraReducers: (builder) => {
     builder
-      .addCase(getEvents.pending, (state) => {
+      .addCase(getVendors.pending, (state) => {
         state.isLoading = true;
         state.status = LOADING;
         state.error = null;
       })
-      .addCase(getEvents.fulfilled, (state, action) => {
+      .addCase(getVendors.fulfilled, (state, action) => {
         state.isLoading = false;
         state.status = SUCCEEDED;
         state.error = null;
         state.data = action.payload;
       })
-      .addCase(getEvents.rejected, (state, action) => {
+      .addCase(getVendors.rejected, (state, action) => {
         state.isLoading = false;
         state.status = FAILED;
         state.error = action.payload;
@@ -51,4 +45,4 @@ const eventSlice = createSlice({
   },
 });
 
-export default eventSlice.reducer;
+export default getVendorSlice.reducer;

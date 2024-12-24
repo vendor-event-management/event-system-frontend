@@ -12,7 +12,8 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Typography from '@mui/material/Typography';
 
 import moment from 'moment';
-import { verify } from '../../utils';
+import { EventStatus, verify as user } from '../../utils';
+import { UserRole } from '../../utils/enums/userRole';
 
 export const EventDetailComponent = ({
   selectorEventDetailData,
@@ -21,7 +22,7 @@ export const EventDetailComponent = ({
   onOpenApproval,
 }) => {
   return (
-    <Dialog open={open} onClose={onClose}>
+    <Dialog open={open}>
       <DialogTitle>Detail event</DialogTitle>
       <DialogContent>
         {selectorEventDetailData.isLoading ? (
@@ -70,16 +71,18 @@ export const EventDetailComponent = ({
             <Grid size={12} pt={2}>
               <Typography fontSize={15}>Proposed dates</Typography>
             </Grid>
-            <Grid container spacing={1}>
-              {selectorEventDetailData.data?.proposedDates?.map((date) => {
-                return (
-                  <Chip
-                    label={moment(date, 'DD-MM-YYYY').format('DD MMMM YYYY')}
-                  />
-                );
-              })}
+            <Grid size={12}>
+              <Grid container spacing={1}>
+                {selectorEventDetailData.data?.proposedDates?.map((date) => {
+                  return (
+                    <Chip
+                      label={moment(date, 'DD-MM-YYYY').format('DD MMMM YYYY')}
+                    />
+                  );
+                })}
+              </Grid>
             </Grid>
-            {selectorEventDetailData.data?.status === 'Approved' && (
+            {selectorEventDetailData.data?.status === EventStatus.Approved && (
               <Grid container pt={2}>
                 <Grid size={12}>
                   <Typography fontSize={15}>Confirmed date</Typography>
@@ -144,8 +147,8 @@ export const EventDetailComponent = ({
                 )}
               />
             </Grid>
-            {verify()?.role === 'Vendor' &&
-              selectorEventDetailData.data?.status === 'Pending' && (
+            {user()?.role === UserRole.Vendor &&
+              selectorEventDetailData.data?.status === EventStatus.Pending && (
                 <Grid item xs={12} sx={{ display: 'flex', gap: 1, mt: 2 }}>
                   <Button
                     type='submit'
@@ -169,7 +172,14 @@ export const EventDetailComponent = ({
         )}
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Close</Button>
+        <Button
+          variant='contained'
+          size='small'
+          color='error'
+          onClick={onClose}
+        >
+          Close
+        </Button>
       </DialogActions>
     </Dialog>
   );

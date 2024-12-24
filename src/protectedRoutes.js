@@ -1,7 +1,7 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 
-import { verify } from './utils';
+import { verify as user } from './utils';
 import { ProtectedRouteTypes } from './utils/enums';
 
 export const ProtectedRoute = ({
@@ -10,11 +10,11 @@ export const ProtectedRoute = ({
   ...props
 }) => {
   if (props.type === ProtectedRouteTypes.TRIPLE) {
-    if (!verify()) {
+    if (!user()) {
       return <Navigate to={props.redirectTo} />;
     }
 
-    const userRole = verify()?.role;
+    const userRole = user()?.role;
 
     if (userRole) {
       return <MainComponent {...props} />;
@@ -22,12 +22,12 @@ export const ProtectedRoute = ({
       return <FallbackComponent {...props} />;
     }
   } else if (props.type === ProtectedRouteTypes.AUTH) {
-    if (verify()) {
+    if (user()) {
       return <Navigate to={props.redirectTo} />;
     }
     return <MainComponent {...props} />;
   } else {
-    return verify() ? (
+    return user() ? (
       <MainComponent {...props} />
     ) : (
       <FallbackComponent {...props} />

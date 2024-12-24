@@ -1,25 +1,18 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { fetchEvents } from '../api';
+import { postEvent } from '../api';
 import { FAILED, IDLE, LOADING, SUCCEEDED } from '../statusEnum';
 
 const initialState = {
-  data: [],
   status: IDLE,
   isLoading: false,
   error: null,
 };
 
-export const getEvents = createAsyncThunk(
-  'event/fetchEvents',
-  async (params = {}, { rejectWithValue }) => {
+export const createEvent = createAsyncThunk(
+  'event/createEvent',
+  async (payload, { rejectWithValue }) => {
     try {
-      const query = {
-        page: params.page || 1,
-        size: params.size || 10,
-        status: params.status,
-        name: params.name,
-      };
-      const response = await fetchEvents(params.userId, query);
+      const response = await postEvent(payload);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || error.message);
@@ -27,23 +20,22 @@ export const getEvents = createAsyncThunk(
   }
 );
 
-const eventSlice = createSlice({
-  name: 'event',
+const eventCreationSlice = createSlice({
+  name: 'eventCreation',
   initialState,
   extraReducers: (builder) => {
     builder
-      .addCase(getEvents.pending, (state) => {
+      .addCase(createEvent.pending, (state) => {
         state.isLoading = true;
         state.status = LOADING;
         state.error = null;
       })
-      .addCase(getEvents.fulfilled, (state, action) => {
+      .addCase(createEvent.fulfilled, (state, action) => {
         state.isLoading = false;
         state.status = SUCCEEDED;
         state.error = null;
-        state.data = action.payload;
       })
-      .addCase(getEvents.rejected, (state, action) => {
+      .addCase(createEvent.rejected, (state, action) => {
         state.isLoading = false;
         state.status = FAILED;
         state.error = action.payload;
@@ -51,4 +43,4 @@ const eventSlice = createSlice({
   },
 });
 
-export default eventSlice.reducer;
+export default eventCreationSlice.reducer;
