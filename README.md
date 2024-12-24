@@ -1,70 +1,136 @@
-# Getting Started with Create React App
+# Event Management System
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A web application for managing events, including creating, approving, and managing event data. This app utilizes React, Redux, and Material-UI for the frontend, with an API backend for handling data.
 
-## Available Scripts
+## Key Features
 
-In the project directory, you can run:
+- Displaying a list of events
+- Filtering events by status
+- Searching for events by name or status
+- Managing events with pagination
+- Login and authentication using JWT
+- Form for creating new events
+- Form for approval event
 
-### `npm start`
+## User Roles
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+1. **HR User**:
+   - Can **create events**.
+   - Can **view only the events created by them**.
+   - Cannot approve or reject events.
+2. **Vendor User**:
+   - Can **view events assigned to them**.
+   - Can **approve or reject events** assigned to them.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Technologies
 
-### `npm test`
+- **Frontend**: React, Redux Toolkit, Material-UI, Day.js
+- **Backend**: API Golang, Gin with MySQL for event, authentication, and user data management
+- **Authentication**: JSON Web Token (JWT)
+- **State Management**: Redux Toolkit
+- **Routing**: React Router DOM
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Prerequisites
 
-### `npm run build`
+- Node.js >= v16.x
+- npm or yarn
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Installation
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+1. **Clone this repository**:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+   ```bash
+   git clone https://github.com/vendor-event-management/event-system-frontend.git
+   cd event-management-frontend
+   ```
 
-### `npm run eject`
+2. **Install dependencies**:
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+   If using `npm`:
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+   ```bash
+   npm install
+   ```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+   Or if using `yarn`:
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+   ```bash
+   yarn install
+   ```
 
-## Learn More
+3. **Run the application**:
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+   After installation, start the application in development mode:
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+   ```bash
+   npm start
+   ```
 
-### Code Splitting
+   Or:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+   ```bash
+   yarn start
+   ```
 
-### Analyzing the Bundle Size
+   The app will run on `http://localhost:3000` by default.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## Usage
 
-### Making a Progressive Web App
+### Authentication
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+- The system uses JWT for login. Users need to log in to access the event pages and manage data.
+  <img src="./src//assets//img/image.png" alt="Image Description" width="800"/>
+  <img src="./src//assets//img/image-2.png" alt="Image Description" width="800"/>
 
-### Advanced Configuration
+### User Role-based Functionality
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+- **HR User**:
 
-### Deployment
+  - After logging in as an HR user, you will be able to:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+    - Create new events.
+    - View only the events that you created.
+    - No options for approving or rejecting events.
 
-### `npm run build` fails to minify
+    Show events after login
+    <img src="./src/assets/img/image-3.png" alt="Image Description" width="900"/>
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+    Sidebar
+
+    <img src="./src/assets/img/image-4.png" alt="Image Description" width="550" height="700"/>
+
+    Detail event
+
+    <img src="./src/assets/img/image-5.png" alt="Image Description" width="800"/>
+
+    Create form
+
+    <img src="./src/assets/img/image-6.png" alt="Image Description" width="800"/>
+
+- **Vendor User**:
+
+  - After logging in as a Vendor user, you will be able to:
+
+    - View events that are assigned to you.
+    - Approve or reject events that are assigned to you.
+
+    Sidebar
+
+    <img src="./src/assets/img/image-7.png" alt="Image Description" width="700" height="600"/>
+
+    Detail event
+
+    <img src="./src/assets/img/image-8.png" alt="Image Description" width="800"/>
+
+    Approval event form
+
+    <img src="./src/assets/img/image-9.png" alt="Image Description" width="800"/>
+
+    Rejection event form
+
+    <img src="./src/assets/img/image-10.png" alt="Image Description" width="800"/>
+
+- **Logout user**:
+
+  - After logout button clicked, it will be redirect to login page:
+    <img src="./src/assets/img/image-11.png" alt="Image Description" width="800"/>

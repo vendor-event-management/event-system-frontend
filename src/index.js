@@ -4,6 +4,9 @@ import App from './App';
 
 import { createTheme, ThemeProvider, CssBaseline } from '@mui/material';
 
+import { Provider } from 'react-redux';
+import { store } from './state/store';
+
 // Create the theme
 const theme = createTheme({
   typography: {
@@ -16,7 +19,9 @@ root.render(
   <React.StrictMode>
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <App />
+      <Provider store={store}>
+        <App />
+      </Provider>
     </ThemeProvider>
   </React.StrictMode>
 );
