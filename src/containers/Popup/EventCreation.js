@@ -239,10 +239,14 @@ export const EventCreationComponent = ({ open, onClose }) => {
             </Grid>
             <Grid size={8}>
               <TextField
-                id='fullLocation'
+                id='location'
                 label='Full location'
                 variant='standard'
+                name='location'
                 fullWidth
+                {...formik.getFieldProps('location')}
+                error={Boolean(formik.errors.location)}
+                helperText={formik.errors.location || ''}
               />
             </Grid>
           </Grid>
