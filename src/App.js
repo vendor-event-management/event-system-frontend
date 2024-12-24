@@ -21,6 +21,27 @@ function App() {
             />
           }
         />
+        <Route
+          path='/dashboard'
+          element={
+            <ProtectedRoute
+              type={ProtectedRouteTypes.TRIPLE}
+              mainComponent={Dashboard}
+              fallbackComponent={Login}
+              redirectTo='/login'
+            />
+          }
+        />
+        <Route
+          path='/login'
+          element={
+            <ProtectedRoute
+              type={ProtectedRouteTypes.AUTH}
+              mainComponent={Login}
+              redirectTo='/dashboard'
+            />
+          }
+        />
       </Routes>
     </BrowserRouter>
   );

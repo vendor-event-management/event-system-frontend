@@ -16,11 +16,16 @@ export const ProtectedRoute = ({
 
     const userRole = verify()?.role;
 
-    if (userRole === 'HR') {
+    if (userRole) {
       return <MainComponent {...props} />;
     } else {
       return <FallbackComponent {...props} />;
     }
+  } else if (props.type === ProtectedRouteTypes.AUTH) {
+    if (verify()) {
+      return <Navigate to={props.redirectTo} />;
+    }
+    return <MainComponent {...props} />;
   } else {
     return verify() ? (
       <MainComponent {...props} />

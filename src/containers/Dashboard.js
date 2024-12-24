@@ -19,20 +19,16 @@ import Select from '@mui/material/Select';
 import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
 import CircularProgress from '@mui/material/CircularProgress';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
-import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import Typography from '@mui/material/Typography';
 import moment from 'moment';
+
 import { useFormik } from 'formik';
 import { useDispatch, useSelector } from 'react-redux';
 import { verify } from '../utils';
 import { getEvents } from '../state/event/eventSlice';
 import { getDetailEvent } from '../state/event/eventDetailSlice';
+import { EventDetailComponent } from './Popup/EventDetail';
+import { EventApprovalComponent } from './Popup/EventApproval';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -55,9 +51,14 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 
 function Dashboard() {
   const [openPopup, setOpenPopup] = React.useState(false);
-  const dispatch = useDispatch();
+  const [openPopupApproval, setOpenPopupApproval] = React.useState(false);
+  const [isApproveEvent, setIsApproveEvent] = React.useState(false);
+
   const selectorEventData = useSelector((state) => state.event);
   const selectorEventDetailData = useSelector((state) => state.eventDetail);
+
+  const dispatch = useDispatch();
+  const userId = verify()?.id;
 
   const handleClickOpenPopup = (event) => {
     dispatch(getDetailEvent({ id: event.id }));
@@ -68,6 +69,15 @@ function Dashboard() {
     setOpenPopup(false);
   };
 
+  const handleClickOpenPopupApproval = (isApprove) => {
+    setIsApproveEvent(isApprove);
+    setOpenPopupApproval(true);
+  };
+
+  const handleClosePopupApproval = () => {
+    setOpenPopupApproval(false);
+  };
+
   const formik = useFormik({
     initialValues: {
       name: '',
@@ -75,17 +85,21 @@ function Dashboard() {
       page: 1,
       size: 10,
     },
-    validateOnChange: false,
-    validateOnBlur: false,
     onSubmit: async (values) => {
-      console.log('values : ', values);
+      console.log(values);
+
+      dispatch(getEvents({ userId, ...values }));
     },
   });
 
-  useEffect(() => {
-    const userId = verify()?.id;
+  const handleClearSearch = () => {
+    formik.resetForm();
     dispatch(getEvents({ userId }));
-  }, [dispatch]);
+  };
+
+  useEffect(() => {
+    dispatch(getEvents({ userId }));
+  }, [dispatch, userId]);
 
   return (
     <React.Fragment>
@@ -107,6 +121,7 @@ function Dashboard() {
                       variant='standard'
                       value={formik.values.name}
                       onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
                       {...formik.getFieldProps('name')}
                     />
                     <FormControl variant='standard' sx={{ minWidth: 120 }}>
@@ -117,6 +132,7 @@ function Dashboard() {
                         label='Status'
                         value={formik.values.status}
                         onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
                         {...formik.getFieldProps('status')}
                       >
                         <MenuItem value=''>
@@ -142,7 +158,7 @@ function Dashboard() {
                         variant='contained'
                         size='small'
                         color='error'
-                        onSubmit={() => formik.resetForm()}
+                        onClick={() => handleClearSearch()}
                       >
                         clear
                       </Button>
@@ -184,10 +200,25 @@ function Dashboard() {
                                   display: 'flex',
                                   justifyContent: 'center',
                                   alignItems: 'center',
-                                  height: '100px', // Atur tinggi area spinner
+                                  height: '50px',
                                 }}
                               >
                                 <CircularProgress />
+                              </Box>
+                            </TableCell>
+                          </TableRow>
+                        ) : !selectorEventData.data?.content?.length ? (
+                          <TableRow>
+                            <TableCell colSpan={7}>
+                              <Box
+                                sx={{
+                                  display: 'flex',
+                                  justifyContent: 'center',
+                                  alignItems: 'center',
+                                  height: '50px',
+                                }}
+                              >
+                                <Typography>No event data</Typography>
                               </Box>
                             </TableCell>
                           </TableRow>
@@ -203,7 +234,9 @@ function Dashboard() {
                               <StyledTableCell align='right'>
                                 {row.proposedDates?.map((date) => (
                                   <Chip
-                                    label={date}
+                                    label={moment(date, 'DD-MM-YYYY').format(
+                                      'DD MMM YYYY'
+                                    )}
                                     variant='outlined'
                                     sx={{ m: 0.2 }}
                                   />
@@ -213,7 +246,7 @@ function Dashboard() {
                                 {row.confirmedDate ? (
                                   <Chip
                                     label={moment(row.confirmedDate).format(
-                                      'DD-MM-YYYY'
+                                      'DD MMM YYYY'
                                     )}
                                     variant='outlined'
                                     sx={{ m: 0.2 }}
@@ -259,68 +292,18 @@ function Dashboard() {
           </Box>
         </Grid>
       </Grid>
-      <Dialog
+      <EventDetailComponent
+        selectorEventDetailData={selectorEventDetailData}
         open={openPopup}
         onClose={handleClosePopup}
-        PaperProps={{
-          component: 'form',
-          onSubmit: (event) => {
-            event.preventDefault();
-          },
-        }}
-      >
-        <DialogTitle>Detail event</DialogTitle>
-        <DialogContent>
-          {selectorEventDetailData.isLoading ? (
-            <Box
-              sx={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                height: '100px', // Atur tinggi area spinner
-              }}
-            >
-              <CircularProgress />
-            </Box>
-          ) : (
-            <Box
-              component='form'
-              sx={{ '& > :not(style)': { m: 1, width: '25ch' } }}
-              noValidate
-              autoComplete='off'
-            >
-              <TextField
-                id='name'
-                label='Name'
-                variant='filled'
-                disabled={true}
-                aria-readonly
-                value={selectorEventDetailData.data?.name}
-              />
-              <TextField
-                id='nameVendor'
-                label='Name Vendor'
-                variant='filled'
-                disabled={true}
-                value={selectorEventDetailData.data?.vendorName}
-              />
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DemoContainer
-                  components={['DatePicker', 'DatePicker', 'DatePicker']}
-                >
-                  <DatePicker label='disabled' disabled />
-                  <DatePicker label='readOnly' readOnly />
-                  <DatePicker label='name' name='startDate' />
-                </DemoContainer>
-              </LocalizationProvider>
-            </Box>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClosePopup}>Cancel</Button>
-          <Button type='submit'>Subscribe</Button>
-        </DialogActions>
-      </Dialog>
+        onOpenApproval={handleClickOpenPopupApproval}
+      />
+      <EventApprovalComponent
+        open={openPopupApproval}
+        onClose={handleClosePopupApproval}
+        proposedDates={selectorEventDetailData?.data?.proposedDates}
+        isApprove={isApproveEvent}
+      />
     </React.Fragment>
   );
 }

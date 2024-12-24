@@ -20,8 +20,11 @@ import Avatar from '@mui/material/Avatar';
 import Stack from '@mui/material/Stack';
 import Grid from '@mui/material/Grid2';
 import Chip from '@mui/material/Chip';
-
+import Swal from 'sweetalert2';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import { verify } from '../utils';
+import { logout } from '../state/auth/authSlice';
 
 const drawerWidth = 240;
 
@@ -48,6 +51,8 @@ const AppBar = styled(MuiAppBar, {
 }));
 
 export default function Header() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [open, setOpen] = React.useState(false);
 
   const handleDrawerOpen = () => {
@@ -56,6 +61,15 @@ export default function Header() {
 
   const handleDrawerClose = () => {
     setOpen(false);
+  };
+
+  const handleLogout = () => {
+    handleDrawerClose();
+    dispatch(logout());
+    Swal.fire({
+      icon: 'success',
+      title: 'Logout successful',
+    }).then(() => navigate('/login', { replace: true }));
   };
 
   return (
@@ -139,7 +153,7 @@ export default function Header() {
         </Grid>
         <Divider />
         <List>
-          <ListItem key='logout' disablePadding>
+          <ListItem key='logout' onClick={() => handleLogout()} disablePadding>
             <ListItemButton>
               <ListItemIcon>
                 <InboxIcon />

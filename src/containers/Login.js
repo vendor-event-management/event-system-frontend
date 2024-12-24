@@ -66,7 +66,7 @@ function Login() {
         Swal.fire({
           icon: 'success',
           title: 'Login successful',
-        }).then(() => navigate('/dashboard'));
+        }).then(() => navigate('/dashboard', { replace: true }));
       } else {
         Swal.fire({
           icon: 'error',
